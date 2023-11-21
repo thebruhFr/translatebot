@@ -29,9 +29,6 @@ Example: `bin 123456`
 
 Feel free to contribute by forking the repository and creating pull requests.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ---
 
