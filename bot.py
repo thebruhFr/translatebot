@@ -113,6 +113,15 @@ def fake_command_handler(message):
 def ping_command(message):
     ping(bot, message)
 
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    # Print user's message in the terminal
+    print(f"User's Message: {message.text}")
+
+    # Echo the user's message back as the bot's response
+    bot_reply = message.text  # Modify this with your bot's actual response logic
+    print(f"Bot's Response: {bot_reply}")
+
 bot.launch_time = time.time()  
 
 print('working')
