@@ -1,12 +1,6 @@
 import telebot
 import requests
 from googletrans import Translator
-import datetime
-import time
-from ping import ping
-from fake import fake_user_info
-from bin import bin_lookup_handler
-import re
 
 translator = Translator()
 
@@ -61,59 +55,37 @@ def perform_translation(message):
     try:
         command_parts = message.text.split(' ', 2)
         language_code = command_parts[1]
+        text_to_translate = command_parts[2]
 
-        if message.reply_to_message and message.reply_to_message.text:
-            text_to_translate = message.reply_to_message.text
-            translated_text = translator.translate(text_to_translate, dest=language_code)
-            bot.send_message(message.chat.id, f"Translated text to {language_code}: {translated_text.text}")
-        else:
-            bot.send_message(message.chat.id, "<b>*Inviald Input*</b>", parse_mode="HTML")
+        translated_text = translator.translate(text_to_translate, dest=language_code)
+        
+        bot.send_message(message.chat.id, f"Translated text to {language_code}: {translated_text.text}")
     except Exception as e:
         bot.send_message(message.chat.id, "Oops! Something went wrong with the translation.")
 
+def bin_lookup(bin_number):
+    response = requests.get(bin_api_url + bin_number)
 
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
         
 @bot.message_handler(commands=['bin'])
-def bin_command_handler(message):
-    bin_lookup_handler(bot, message)  # Call the bin_lookup_handler function here passing the bot and message
+def bin_lookup_handler(message):
+    try:
+        bin_number = message.text.split(' ', 1)[1][:6] 
+        url = 'https://bins.antipublic.cc/bins/'
+        response = requests.get(url + bin_number).json()
 
+        if response:
+            response_text = f"BIN Number: {response['bin']}\nBrand: {response['brand']}\nBank: {response['bank']}\nType: {response['type']}"
+        else:
+            response_text = "Sorry, couldn't find information for the provided BIN."
 
-def clean_and_format_card(card_entry):
+        bot.send_message(message.chat.id, response_text, reply_to_message_id=message.message_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "Oops! Something went wrong with the BIN lookup.")
 
-    match = re.search(r"(\d{16})[:|\/\r\n\n ](\d{1,2})[:|\/\r\n\n ](\d{2,4})[:|\/\r\n\n ](\d{3,4})", card_entry)
-    
-    if match:
-        cc = match.group(1)
-        mes = match.group(2)
-        ano = match.group(3)
-        cvv = match.group(4)
-
-        if len(mes) == 1:
-            mes = "0" + mes
-        if len(ano) == 2:
-            ano = "20" + ano
-
-
-        return f"Cleaned Card Information:\nCC: {cc}\nExpiration: {mes}/{ano}\nCVV: {cvv}"
-    
-    return "Couldn't extract valid card information."
-
-@bot.message_handler(commands=['clean'])
-def clean_card_handler(message):
-    card_info = message.reply_to_message.text if message.reply_to_message else message.text.split(' ', 1)[1]
-    cleaned_message = clean_and_format_card(card_info)
-    
-    bot.reply_to(message, f'<pre>{cleaned_message}</pre>', parse_mode="HTML")
-
-@bot.message_handler(commands=['fake'])
-def fake_command_handler(message):
-    fake_user_info(bot, message)
-
-@bot.message_handler(commands=['ping'])
-def ping_command(message):
-    ping(bot, message)
-
-bot.launch_time = time.time()  
-
-print('working')
-bot.infinity_polling()
+print('bot is working')
+bot.polling()
