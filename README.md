@@ -32,5 +32,5 @@ Feel free to contribute by forking the repository and creating pull requests.
 
 ---
 
-![Translator Bot Screenshot](URL_to_translator_bot_screenshot)
+![Translator Bot Screenshot](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/2048px-Google_Translate_logo.svg.png)
 ![Horoscope Lookup Screenshot](URL_to_horoscope_lookup_screenshot)
