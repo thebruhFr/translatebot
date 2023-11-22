@@ -10,7 +10,9 @@ import re
 
 translator = Translator()
 
-BOT_TOKEN = '6951947854:AAGCqOrf-UKCXiANjHAHuF2m8YtYYGGTnd8'
+tk = input("EnterYourBotToken: ")
+
+BOT_TOKEN = tk
 owner = 'yooon_ah'
 
 bot = telebot.TeleBot(BOT_TOKEN)
